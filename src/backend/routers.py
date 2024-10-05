@@ -100,15 +100,16 @@ def change_password(user: PasswordChangeRequest, db: Session = Depends(get_db)):
     
     return {"msg": "Password updated successfully"}
 
-#SQL injection vulnerability for dashboard page -> client name : shlomi' , 'cohen' , 'hacker@gmail.com' , '054' ); DROP TABLE clients; -- #
+# XSS attack : <img src="x" onerror="window.location=\'https://www.hit.ac.il/\'">
+#SQL injection vulnerability for dashboard page -> client name :  hacker' , 'Sqli' , 'hacker@gmail.com' , '0' );#
 # Add a client to the clients table
 @user_router.post("/Dashboard/")
 def add_client(client: ClientCreate, db: Session = Depends(get_db)):
-    # try:
-    #     create_client(db, client)
-    # except Exception as e:
-    #     #print("error: ",e)
-    #     raise HTTPException(status_code=400, detail=str(e))
+    try:
+        create_client(db, client)
+    except Exception as e:
+        #print("error: ",e)
+        raise HTTPException(status_code=400, detail=str(e))
     
     create_client(db , client)
     return {"msg": "Client added successfully"}
@@ -142,10 +143,41 @@ def get_clients(db: Session = Depends(get_db)):
                     "clientEmail": row["clientEmail"],
                     "clientPhoneNumber": row["clientPhoneNumber"],
                     "selectedPackage": package_information,
-                    "selectedSector": sector["name"]
+                    "selectedSector": sector["name"] ,
+                    "clientID" : clientID
                 })
 
         return client_list
     
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+    
+# New DELETE endpoint to delete a client
+@user_router.delete("/clients/{client_id}")
+def delete_client(client_id: int, db: Session = Depends(get_db)):
+    try:
+        # Check if the client exists
+        client_query = text("SELECT * FROM clients WHERE clientID = :client_id")
+        client = db.execute(client_query, {"client_id": client_id}).fetchone()
+
+        if not client:
+            raise HTTPException(status_code=404, detail="Client not found")
+
+        # Delete associated internet packages
+        delete_packages_query = text("DELETE FROM internet_packages WHERE client_id = :client_id")
+        db.execute(delete_packages_query, {"client_id": client_id})
+
+        # Delete associated sectors
+        delete_sectors_query = text("DELETE FROM sectors WHERE client_id = :client_id")
+        db.execute(delete_sectors_query, {"client_id": client_id})
+
+        # Delete the client
+        delete_client_query = text("DELETE FROM clients WHERE clientID = :client_id")
+        db.execute(delete_client_query, {"client_id": client_id})
+
+        db.commit()
+        
+        return {"msg": "Client deleted successfully"}
+
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal Server Error")

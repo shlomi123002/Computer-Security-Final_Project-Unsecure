@@ -17,6 +17,7 @@ const FullScreenContainer = styled('div')({
   backgroundRepeat: 'no-repeat',
 });
 
+
 const DashboardWrapper = styled(Paper)({
   padding: '40px',
   margin: '20px auto',
@@ -31,11 +32,11 @@ const Dashboard = () => {
   const [clientEmail, setEmail] = useState('');
   const [selectedPackage, setSelectedPackage] = useState('');
   const [selectedSector, setSelectedSector] = useState('');
-  const [responseMessage, setResponseMessage] = useState('');
-  const navigate = useNavigate();
+  const navigate = useNavigate();  
   const { state } = useLocation();
   const { username } = state;
 
+  // Define the available packages
   const packages = [
     { name: 'Basic', speed: '50 Mbps', data: '200GB', price: '$20' },
     { name: 'Normal', speed: '200 Mbps', data: '500GB', price: '$30' },
@@ -58,7 +59,6 @@ const Dashboard = () => {
 
       if (response.status === 200) {
         alert('Client added successfully');
-        setResponseMessage(response.data.message); // Set the response message from backend
         setFirstName('');
         setLastName('');
         setPhoneNumber('');
@@ -74,7 +74,7 @@ const Dashboard = () => {
   };
 
   const handleViewClients = () => {
-    navigate('/client-table', { state: { username: username, selectedPackage, selectedSector } });
+    navigate('/client-table', { state: { username: username} });
   };
 
   const handleChangePassword = () => {
@@ -159,9 +159,6 @@ const Dashboard = () => {
             </Button>
           </Box>
         </form>
-
-        {/* Render the response message that may contain an XSS payload */}
-        <div id="responseMessage" dangerouslySetInnerHTML={{ __html: responseMessage }}></div>
 
         <Box mt={2} textAlign="center">
           <Button onClick={handleViewClients} variant="contained" color="inherit" fullWidth>

@@ -17,10 +17,9 @@ const FullScreenContainer = styled('div')({
   backgroundRepeat: 'no-repeat',
 });
 
-
 const ClientList = () => {
   const [clients, setClients] = useState([]);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const { state } = useLocation();
   const { username } = state;
 
@@ -28,13 +27,12 @@ const ClientList = () => {
     navigate('/');
   };
 
-const handleDashboard = () => {
-    navigate('/dashboard', { state: { username : username } } );
-};
+  const handleDashboard = () => {
+    navigate('/dashboard', { state: { username: username } });
+  };
 
-
+  // Fetch clients from the backend
   useEffect(() => {
-    // Fetch clients from the backend
     const fetchClients = async () => {
       try {
         const response = await axios.get('http://localhost:8000/client-table');
@@ -48,11 +46,27 @@ const handleDashboard = () => {
     fetchClients();
   }, []);
 
+  // Handle client deletion
+  const handleDelete = async (clientID) => {
+    try {
+      // Make the DELETE request to delete the client from the backend
+      await axios.delete(`http://localhost:8000/clients/${clientID}`);
+
+      // Update the local state to remove the deleted client from the list
+      setClients(clients.filter((client) => client.id !== clientID));
+      alert('Client deleted successfully!');
+      window.location.reload();
+    } catch (error) {
+      console.error('Error deleting client:', error);
+      alert('Failed to delete client');
+    }
+  };
+
   return (
     <FullScreenContainer>
       <Box m={4}>
         <Typography variant="h4" gutterBottom align="center">
-          Client List 
+          Client List
         </Typography>
         <TableContainer component={Paper}>
           <Table>
@@ -64,33 +78,54 @@ const handleDashboard = () => {
                 <TableCell>Email</TableCell>
                 <TableCell>Package</TableCell>
                 <TableCell>Sector</TableCell>
+                <TableCell>Delete</TableCell> 
               </TableRow>
             </TableHead>
             <TableBody>
               {clients.map((client) => (
-                <TableRow key={client.id}>
-                  <TableCell>{client.clientFirstName}</TableCell>
-                  <TableCell>{client.clientLastName}</TableCell>
-                  <TableCell>{client.clientPhoneNumber}</TableCell>
-                  <TableCell>{client.clientEmail}</TableCell>
-                  <TableCell>{client.selectedPackage}</TableCell>
-                  <TableCell>{client.selectedSector}</TableCell>
-
+                <TableRow key={client.clientID}>
+                  <TableCell>
+                    <div dangerouslySetInnerHTML={{ __html: client.clientFirstName }}></div>
+                  </TableCell>
+                  <TableCell>
+                    <div dangerouslySetInnerHTML={{ __html: client.clientLastName }}></div>
+                  </TableCell>
+                  <TableCell>
+                    <div dangerouslySetInnerHTML={{ __html: client.clientPhoneNumber }}></div>
+                  </TableCell>
+                  <TableCell>
+                    <div dangerouslySetInnerHTML={{ __html: client.clientEmail }}></div>
+                  </TableCell>
+                  <TableCell>
+                    <div dangerouslySetInnerHTML={{ __html: client.selectedPackage }}></div>
+                  </TableCell>
+                  <TableCell>
+                    <div dangerouslySetInnerHTML={{ __html: client.selectedSector }}></div>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="contained"
+                      color="error"
+                      onClick={() => handleDelete(client.clientID)} // Pass client ID to the delete handler
+                    >
+                      Delete
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
-      <Box mt={2} textAlign="center">
+        <Box mt={2} textAlign="center">
           <Button color="secondary" onClick={handleDashboard}>
-          Dashboard
+            Dashboard
           </Button>
-      </Box>
-      <Box mt={2} textAlign="center">
+        </Box>
+        <Box mt={2} textAlign="center">
           <Button color="secondary" onClick={handleLoginPage}>
-          Log Out
+            Log Out
           </Button>
-      </Box>
+        </Box>
       </Box>
     </FullScreenContainer>
   );

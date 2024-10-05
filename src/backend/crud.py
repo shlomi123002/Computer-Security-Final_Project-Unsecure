@@ -1,5 +1,4 @@
 from sqlalchemy import text
-from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from schemas import UserCreate
 from utils import get_password_hash , check_common_password
@@ -163,8 +162,7 @@ def create_client(db: Session,client: ClientCreate):
 
     client_query = text(f"INSERT INTO clients (clientFirstName, clientLastName, clientEmail, clientPhoneNumber) VALUES ('{client.clientFirstName}', '{client.clientLastName}', '{client.clientEmail}', '{client.clientPhoneNumber}')")
     print("client_query: ", client_query)
-    #client_query = "INSERT INTO clients (clientID , clientFirstName, clientLastName, clientEmail, clientPhoneNumber) VALUES ('shlomi' , 'cohen' , 'hacker@gmail.com' , '054' ); DROP TABLE clients; -- #', 'cohen', 'hacker@gmail.com', '054')"
-    db.execute(client_query, execution_options={"multi": True})
+    db.execute(client_query)
     db.commit()
 
     clientID_query = f"SELECT clientID FROM clients WHERE clientFirstName = '{client.clientFirstName}' AND clientLastName = '{client.clientLastName}' AND clientEmail = '{client.clientEmail}' AND clientPhoneNumber = '{client.clientPhoneNumber}'"
