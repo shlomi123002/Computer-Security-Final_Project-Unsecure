@@ -100,7 +100,7 @@ def change_password(user: PasswordChangeRequest, db: Session = Depends(get_db)):
     
     return {"msg": "Password updated successfully"}
 
-# XSS attack : <img src="x" onerror="window.location=\'https://www.hit.ac.il/\'">
+#XSS attack : <img src="x" onerror="window.location=\'https://www.hit.ac.il/\'">
 #SQL injection vulnerability for dashboard page -> client name :  hacker' , 'Sqli' , 'hacker@gmail.com' , '0' );#
 # Add a client to the clients table
 @user_router.post("/Dashboard/")
