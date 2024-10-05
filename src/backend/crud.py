@@ -7,7 +7,6 @@ from schemas import ClientCreate
 import json
 from secrets import token_bytes
 from datetime import datetime, timedelta
-from models import Client
 
 
 # Function to generate a random salt
@@ -255,23 +254,3 @@ def number_of_password_history() -> int:
         config = json.load(file)
 
     return config['password_history']
-
-def delete_client(db: Session, clientID: str):
-    delete_client_query = f"""
-        DELETE FROM clients
-        WHERE clientID = '{clientID}'
-    """
-    db.execute(delete_client_query)
-    db.commit()
-
-def update_client(db: Session, client: ClientCreate):
-    update_client_query = f"""
-        UPDATE clients
-        SET clientFirstName = '{client.clientFirstName}', clientLastName = '{client.clientLastName}', clientEmail = '{client.clientEmail}', clientPhoneNumber = '{client.clientPhoneNumber}'
-        WHERE clientID = '{client.clientID}'
-    """
-    db.execute(update_client_query)
-    db.commit()
-
-    insert_into_internet_package(db, client.selectedPackage, client.clientID)
-    insert_into_sectors(db, client.selectedSector, client.clientID)
