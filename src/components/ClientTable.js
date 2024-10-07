@@ -31,12 +31,11 @@ const ClientList = () => {
     navigate('/dashboard', { state: { username: username } });
   };
 
-  // Fetch clients from the backend
   useEffect(() => {
     const fetchClients = async () => {
       try {
         const response = await axios.get('http://localhost:8000/client-table');
-        setClients(response.data); // Assume the data is an array of clients
+        setClients(response.data); 
       } catch (error) {
         console.error('Error fetching clients:', error);
         alert('Failed to fetch client data');
@@ -46,13 +45,9 @@ const ClientList = () => {
     fetchClients();
   }, []);
 
-  // Handle client deletion
   const handleDelete = async (clientID) => {
     try {
-      // Make the DELETE request to delete the client from the backend
       await axios.delete(`http://localhost:8000/clients/${clientID}`);
-
-      // Update the local state to remove the deleted client from the list
       setClients(clients.filter((client) => client.id !== clientID));
       alert('Client deleted successfully!');
       window.location.reload();
@@ -106,7 +101,7 @@ const ClientList = () => {
                     <Button
                       variant="contained"
                       color="error"
-                      onClick={() => handleDelete(client.clientID)} // Pass client ID to the delete handler
+                      onClick={() => handleDelete(client.clientID)}
                     >
                       Delete
                     </Button>

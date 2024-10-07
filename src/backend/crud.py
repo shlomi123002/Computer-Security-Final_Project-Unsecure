@@ -31,26 +31,19 @@ def create_user(db: Session, user: UserCreate):
     db.execute(insert_user_query)
     insert_into_passwordhistory_table(db, user.username, hashed_password, salt)
     
-    db.commit()  # Commit the transaction
+    db.commit()
     
     return {"msg": f"User {user.username} registered successfully!"}
 
-def get_user(db: Session, username: str):
-    # Fetch user by username 
-    get_user_query = f"SELECT * FROM users WHERE userName = '{username}'"
-    result = db.execute(get_user_query).fetchone()
-    
-    return result  # This returns a Row object
-
 def number_of_attempts() -> int:
-    # Load the config.json file
+    # Load the config.json file and take number of attempts
     with open('config.json', 'r') as file:
         config = json.load(file)
     
     return config['number_of_attempts']
 
 def block_time_in_seconds() -> int:
-    # Load the config.json file
+    # Load the config.json file and take block time
     with open('config.json', 'r') as file:
         config = json.load(file)
     
@@ -119,7 +112,7 @@ def validate_user(db: Session, username: str, password: str):
         db.commit()
         raise ValueError("Invalid username or password")
 
-
+#Check if password is currect
 def verify_password(db: Session, current_password: str, user_name: str) -> bool:
     salt_query = f"SELECT salt FROM users WHERE userName = '{user_name}'"
     salt_result = db.execute(salt_query).fetchone()
@@ -135,11 +128,7 @@ def verify_password(db: Session, current_password: str, user_name: str) -> bool:
 
     return current_password_after_hash == table_password[0]
 
-def get_user_by_name(db: Session, username: str):
-    get_user_query = f"SELECT * FROM users WHERE userName = '{username}' LIMIT 1"
-    result = db.execute(get_user_query).fetchone()
-    return result
-
+#Update new passord in database
 def update_password(db: Session, username, new_password: str):
     salt = generate_salt()
     hashed_password = get_password_hash(new_password, salt)
@@ -158,10 +147,10 @@ def update_password(db: Session, username, new_password: str):
     insert_into_passwordhistory_table(db, username, hashed_password, salt)
     return True
 
+#Add new client to data base
 def create_client(db: Session,client: ClientCreate):
 
     client_query = text(f"INSERT INTO clients (clientFirstName, clientLastName, clientEmail, clientPhoneNumber) VALUES ('{client.clientFirstName}', '{client.clientLastName}', '{client.clientEmail}', '{client.clientPhoneNumber}')")
-    print("client_query: ", client_query)
     db.execute(client_query)
     db.commit()
 
@@ -169,11 +158,13 @@ def create_client(db: Session,client: ClientCreate):
     result = db.execute(clientID_query).fetchone()
     clientID = result['clientID']
 
+
     insert_into_internet_package(db, client.selectedPackage, clientID)
     insert_into_sectors(db, client.selectedSector, clientID)
     
     return {"message": "Client created successfully"}
 
+#For each client have sector ,update in database
 def insert_into_sectors(db: Session, sector: str, client_id: str):
     name = sector
     client_query = f"""
@@ -183,6 +174,7 @@ def insert_into_sectors(db: Session, sector: str, client_id: str):
     db.execute(client_query)
     db.commit()
 
+#For each client have internet package ,update in database
 def insert_into_internet_package(db: Session, package: str, clientID: str):
     if package == "Basic":
         name = "Basic"
@@ -207,6 +199,7 @@ def insert_into_internet_package(db: Session, package: str, clientID: str):
     db.execute(client_query)
     db.commit()
 
+#For each password insert it to password history table and keep last number of passwords that mention in json file
 def insert_into_passwordhistory_table(db: Session, username: str, password: str, salt: str):
     insert_passwordhistory_query = f"""
         INSERT INTO passwordhistory (userName, password, salt)
@@ -231,6 +224,7 @@ def insert_into_passwordhistory_table(db: Session, username: str, password: str,
     db.execute(clean_up_query)
     db.commit()
 
+
 def check_password_history(db: Session, username: str, new_password: str) -> bool:
     number_of_history = number_of_password_history()
 
@@ -248,6 +242,7 @@ def check_password_history(db: Session, username: str, new_password: str) -> boo
     return True
 
 def number_of_password_history() -> int:
+    # Load the config.json file and take number of password history to store
     with open('config.json', 'r') as file:
         config = json.load(file)
 

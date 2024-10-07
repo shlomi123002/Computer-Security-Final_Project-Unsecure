@@ -26,7 +26,6 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
 
-  // Track password validation states
   const [passwordValidations, setPasswordValidations] = useState({
     length: false,
     uppercase: false,
@@ -52,13 +51,13 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/register', {
+        await axios.post('http://localhost:8000/register', {
         username: username,
         email: email,
         password: password,
       });
       alert(`User registered successfully`);
-      navigate('/'); // Redirect to login page after successful registration
+      navigate('/'); 
     } catch (error) {
       console.error("There was an error registering the user!", error);
       alert('One of the fields is incorrect');

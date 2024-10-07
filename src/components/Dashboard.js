@@ -17,7 +17,6 @@ const FullScreenContainer = styled('div')({
   backgroundRepeat: 'no-repeat',
 });
 
-
 const DashboardWrapper = styled(Paper)({
   padding: '40px',
   margin: '20px auto',
@@ -36,7 +35,6 @@ const Dashboard = () => {
   const { state } = useLocation();
   const { username } = state;
 
-  // Define the available packages
   const packages = [
     { name: 'Basic', speed: '50 Mbps', data: '200GB', price: '$20' },
     { name: 'Normal', speed: '200 Mbps', data: '500GB', price: '$30' },
@@ -124,7 +122,6 @@ const Dashboard = () => {
             margin="normal"
             required
           />
-
           <FormControl fullWidth margin="normal" required>
             <InputLabel>Select Package</InputLabel>
             <Select

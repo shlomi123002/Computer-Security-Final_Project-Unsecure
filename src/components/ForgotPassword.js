@@ -30,8 +30,6 @@ const ForgotPassword = () => {
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -39,7 +37,6 @@ const ForgotPassword = () => {
         user_name: username,
       });
       setMessage(response.data.msg);
-      // Redirect to reset password page after recovery code is sent
       navigate('/reset-password', { state: { username: username } });
     } catch (error) {
       if (error.response && error.response.status === 404) {
